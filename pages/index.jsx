@@ -521,31 +521,12 @@ const GameContainer = styled.div`
 
 const GameHeader = styled.div`
   position: absolute;
-  display: flex;
+  text-align: center;
   top: 0;
   left: 0;
   right: 0;
   padding: 16px;
   z-index: 2;
-
-  a {
-    flex: 1;
-  }
-
-  span {
-    text-align: center;
-  }
-
-  span + a {
-    flex: 1;
-    text-align: right;
-  }
-`;
-
-const GameLink = styled.a`
-  font-size: 14px;
-  color: #6a6a6a;
-  text-decoration: none;
 `;
 
 const TeamLogo = styled.div`
@@ -624,19 +605,24 @@ export default class extends Component {
   }
 
   fetchGames = async () => {
-    const scheduleResponse = await axios.get('/api/v1/schedule');
+    const scheduleResponse = await axios.get(
+      '/api/v1/schedule?expand=schedule.game.seriesSummary,seriesSummary.series'
+    );
+    const scheduledGames = scheduleResponse.data.dates.reduce(
+      (acc, date) => acc.concat(date.games),
+      []
+    );
+
     const redditResponse = await axios.get(
       'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22+OR+flair%3A%22%5BGDT+Playoffs%5D%22&restrict_sr=on&sort=new&t=day'
     );
     const gameResponses = await Promise.all(
-      scheduleResponse.data.dates.reduce(
-        (acc, date) => acc.concat(date.games.map(game => axios.get(game.link))),
-        []
-      )
+      scheduledGames.map(game => axios.get(game.link))
     );
 
-    const games = gameResponses.map(gameResponse => ({
+    const games = gameResponses.map((gameResponse, i) => ({
       id: gameResponse.data.gamePk,
+      ...scheduledGames[i].seriesSummary,
       ...gameResponse.data.gameData,
       ...gameResponse.data.liveData
     }));
@@ -652,6 +638,9 @@ export default class extends Component {
               post.title.includes(game.teams.away.name) &&
               post.title.includes(game.teams.home.name)
           ),
+          roundLabel: `Round ${game.series.round.number}`,
+          gameLabel: game.gameLabel,
+          seriesLabel: game.seriesStatusShort,
           status: parseInt(game.status.statusCode),
           period: game.linescore.currentPeriodOrdinal,
           time: game.linescore.currentPeriodTimeRemaining,
@@ -725,23 +714,12 @@ export default class extends Component {
         <GameList>
           {this.state.games.map(game => (
             <GameContainer key={game.id}>
-              {game.gdt && (
-                <GameHeader>
-                  <GameLink
-                    href={`https://reddit.com/comments/${game.gdt.id}/`}
-                    target="_blank"
-                  >
-                    Game Thread
-                  </GameLink>
-                  <span>{game.date.format('ddd, MMM DD [at] h:mm A')}</span>
-                  <GameLink
-                    href={`https://reddit-stream.com/comments/${game.gdt.id}/`}
-                    target="_blank"
-                  >
-                    Comment Stream
-                  </GameLink>
-                </GameHeader>
-              )}
+              <GameHeader>
+                {game.date.format('ddd, MMM DD [at] h:mm A')} &middot;{' '}
+                {game.roundLabel} &middot; {game.gameLabel} &middot;{' '}
+                {game.seriesLabel}
+              </GameHeader>
+
               <TeamColumn>
                 <TeamLogo team={game.awayTeam.name} side="away" />
                 <TeamName>{game.awayTeam.name}</TeamName>
