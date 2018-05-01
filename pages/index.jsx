@@ -5,6 +5,40 @@ import moment from 'moment';
 
 axios.defaults.baseURL = 'https://statsapi.web.nhl.com/';
 
+const teams = {
+  1: 'NJD',
+  2: 'NYI',
+  3: 'NYR',
+  4: 'PHI',
+  5: 'PIT',
+  6: 'BOS',
+  7: 'BUF',
+  8: 'MTL',
+  9: 'OTT',
+  10: 'TOR',
+  12: 'CAR',
+  13: 'FLA',
+  14: 'TBL',
+  15: 'WSH',
+  16: 'CHI',
+  17: 'DET',
+  18: 'NSH',
+  19: 'STL',
+  20: 'CGY',
+  21: 'COL',
+  22: 'EDM',
+  23: 'VAN',
+  24: 'ANA',
+  25: 'DAL',
+  26: 'LAK',
+  28: 'SJS',
+  29: 'CBJ',
+  30: 'MIN',
+  52: 'WPG',
+  53: 'ARI',
+  54: 'VGK'
+};
+
 const logos = {
   ANA: {
     common: css`
@@ -334,8 +368,7 @@ const logos = {
       background-position: 100% 50%;
     `,
     home: css`
-      background-position: 100% 50%;
-      transform: scaleX(-1);
+      background-position: 0 50%;
     `
   },
   TOR: {
@@ -470,7 +503,7 @@ const PlayTitle = styled.span`
   text-align: center;
   margin: 0 16px;
   line-height: 1.6;
-  font-family: 'Roboto';
+  font-weight: 400;
 `;
 
 const PlayTime = styled.div`
@@ -500,7 +533,7 @@ const TeamColumn = styled.div`
 const GameColumn = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 32px;
+  padding: 16px 32px;
   text-align: center;
   justify-content: center;
 `;
@@ -520,13 +553,10 @@ const GameContainer = styled.div`
 `;
 
 const GameHeader = styled.div`
-  position: absolute;
-  text-align: center;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 16px;
-  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.6;
 `;
 
 const TeamLogo = styled.div`
@@ -561,14 +591,18 @@ const TeamShots = styled.div`
 `;
 
 const GamePeriod = styled.span`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   font-size: 24px;
   font-weight: 500;
 `;
 
 const GameClock = styled.span`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+  font-weight: 400;
   font-size: 24px;
   line-height: 2;
 
@@ -578,7 +612,7 @@ const GameClock = styled.span`
 const GameSpecial = styled.span`
   display: flex;
   flex-direction: column;
-  margin-top: 32px;
+  margin-top: 24px;
   font-size: 18px;
   line-height: 1.6;
 
@@ -592,6 +626,12 @@ const GameSpecial = styled.span`
     transform: translateY(-50%);
   }
 `;
+
+function formatMinutes(minutes) {
+  return `${Math.floor(minutes / 60)}:${('00' + Math.floor(minutes % 60)).slice(
+    -2
+  )}`;
+}
 
 export default class extends Component {
   state = {
@@ -640,28 +680,23 @@ export default class extends Component {
           ),
           roundLabel: `Round ${game.series.round.number}`,
           gameLabel: game.gameLabel,
-          seriesLabel: game.seriesStatusShort,
+          seriesLabel: game.seriesStatusShort || 'Tied 0-0',
           status: parseInt(game.status.statusCode),
           period: game.linescore.currentPeriodOrdinal,
           time: game.linescore.currentPeriodTimeRemaining,
           stopped:
             game.plays.currentPlay &&
             game.plays.currentPlay.result.eventTypeId === 'STOP',
-          intermission:
-            game.linescore.intermissionInfo.intermissionTimeRemaining,
+          intermission: game.linescore.intermissionInfo.inIntermission,
+          intermissionTime: formatMinutes(
+            game.linescore.intermissionInfo.intermissionTimeRemaining
+          ),
           powerplay:
             game.linescore.powerPlayInfo &&
             game.linescore.powerPlayInfo.inSituation,
           powerplayTime:
             game.linescore.powerPlayInfo &&
-            `${Math.floor(
-              game.linescore.powerPlayInfo.situationTimeRemaining / 60
-            )}:${(
-              '00' +
-              Math.floor(
-                game.linescore.powerPlayInfo.situationTimeRemaining % 60
-              )
-            ).slice(-2)}`,
+            formatMinutes(game.linescore.powerPlayInfo.situationTimeRemaining),
           homeTeam: {
             name: game.teams.home.abbreviation,
             goals: game.linescore.teams.home.goals,
@@ -714,12 +749,6 @@ export default class extends Component {
         <GameList>
           {this.state.games.map(game => (
             <GameContainer key={game.id}>
-              <GameHeader>
-                {game.date.format('ddd, MMM DD [at] h:mm A')} &middot;{' '}
-                {game.roundLabel} &middot; {game.gameLabel} &middot;{' '}
-                {game.seriesLabel}
-              </GameHeader>
-
               <TeamColumn>
                 <TeamLogo team={game.awayTeam.name} side="away" />
                 <TeamName>{game.awayTeam.name}</TeamName>
@@ -742,42 +771,48 @@ export default class extends Component {
                 {game.awayTeam.emptyNet && <GameSpecial>Empty Net</GameSpecial>}
               </TeamColumn>
               <GameColumn>
-                {game.status <= 2 && (
-                  <GamePeriod>{game.date.format('h:mm A')}</GamePeriod>
-                )}
+                <GameHeader>
+                  <span>
+                    {game.roundLabel} &middot; {game.gameLabel} &middot;{' '}
+                    {game.seriesLabel}
+                  </span>
+                  <span>{game.date.format('ddd, MMM DD [at] h:mm A')}</span>
+                </GameHeader>
+                <GamePeriod>
+                  {game.status <= 2 && (
+                    <span>{game.date.format('h:mm A')}</span>
+                  )}
+                  {game.time !== 'END' &&
+                    game.time !== 'Final' && (
+                      <Fragment>
+                        <span>{game.period}</span>
+                        <GameClock stopped={game.stopped}>
+                          {game.time}
+                        </GameClock>
+                      </Fragment>
+                    )}
+                  {game.time === 'END' && <span>End of {game.period}</span>}
+                  {game.time === 'Final' && <span>Final</span>}
+                </GamePeriod>
 
-                {game.time !== 'END' &&
-                  game.time !== 'Final' && (
+                <GameSpecial>
+                  {game.intermission && (
                     <Fragment>
-                      <GamePeriod>{game.period}</GamePeriod>
-                      <GameClock stopped={game.stopped}>{game.time}</GameClock>
-                      {game.powerplay &&
-                        game.awayTeam.skaters === game.homeTeam.skaters && (
-                          <GameSpecial>
-                            <span>
-                              {game.awayTeam.skaters} on {game.homeTeam.skaters}
-                            </span>
-                            <span>{game.powerplayTime}</span>
-                          </GameSpecial>
-                        )}
+                      <span>Intermission</span>
+                      <span>{game.intermissionTime}</span>
                     </Fragment>
                   )}
-
-                {game.time === 'END' && (
-                  <Fragment>
-                    <GamePeriod>End of {game.period}</GamePeriod>
-                    <GameSpecial>
-                      <span>Intermission</span>
-                      <span>
-                        {Math.floor(game.intermission / 60)}:{(
-                          '00' + Math.floor(game.intermission % 60)
-                        ).slice(-2)}
-                      </span>
-                    </GameSpecial>
-                  </Fragment>
-                )}
-
-                {game.time === 'Final' && <GamePeriod>Final</GamePeriod>}
+                  {!game.intermission &&
+                    game.powerplay &&
+                    game.awayTeam.skaters === game.homeTeam.skaters && (
+                      <Fragment>
+                        <span>
+                          {game.awayTeam.skaters} on {game.homeTeam.skaters}
+                        </span>
+                        <span>{game.powerplayTime}</span>
+                      </Fragment>
+                    )}
+                </GameSpecial>
               </GameColumn>
               <TeamColumn>
                 <TeamLogo team={game.homeTeam.name} side="home" />
@@ -806,47 +841,55 @@ export default class extends Component {
           ))}
         </GameList>
         <PlayList>
-          {this.state.plays.map(play => (
-            <Play key={play.result.eventCode} theme={play.result.eventTypeId}>
-              {['GOAL', 'PENALTY'].includes(play.result.eventTypeId) ? (
-                <Fragment>
-                  <PlayLogo
-                    src={`/static/logos/logo_${play.team.triCode.toLowerCase()}.svg`}
-                  />
-                  <PlayTitle>
-                    {play.result.description
-                      .replace(', assists: none', '')
-                      .replace(', assists:', ' assisted by')
-                      .replace(/ \(\d+\)/g, '')
-                      .replace(', ', ' and ')
-                      .replace(
-                        play.result.secondaryType,
-                        play.result.secondaryType.toLowerCase()
-                      )}
-                  </PlayTitle>
-                  <PlayTime>
-                    <span>{play.about.ordinalNum}</span>
-                    <span>{play.about.periodTime}</span>
-                  </PlayTime>
-                </Fragment>
-              ) : (
-                <Fragment>
-                  <PlayLogo
-                    src={`/static/logos/logo_${play.awayTeam.name.toLowerCase()}.svg`}
-                  />
-                  <PlayTitle>
-                    {play.result.eventTypeId === 'PERIOD_START'
-                      ? 'Start'
-                      : 'End'}{' '}
-                    of {play.about.ordinalNum} Period
-                  </PlayTitle>
-                  <PlayLogo
-                    src={`/static/logos/logo_${play.homeTeam.name.toLowerCase()}.svg`}
-                  />
-                </Fragment>
-              )}
-            </Play>
-          ))}
+          {this.state.plays.map(play => {
+            return (
+              <Play key={play.result.eventCode} theme={play.result.eventTypeId}>
+                {['GOAL', 'PENALTY'].includes(play.result.eventTypeId) ? (
+                  <Fragment>
+                    <PlayLogo
+                      src={`/static/logos/logo_${teams[
+                        play.team.id
+                      ].toLowerCase()}.svg`}
+                    />
+                    <PlayTitle>
+                      {play.result.description
+                        .replace(', assists: none', '')
+                        .replace(', assists:', ' assisted by')
+                        .replace(/ \(\d+\)/g, '')
+                        .replace(', ', ' and ')
+                        .replace(
+                          play.result.secondaryType,
+                          play.result.secondaryType.toLowerCase()
+                        )
+                        .replace(
+                          'interference - goalkeeper',
+                          'goaltender interference'
+                        )}
+                    </PlayTitle>
+                    <PlayTime>
+                      <span>{play.about.ordinalNum}</span>
+                      <span>{play.about.periodTime}</span>
+                    </PlayTime>
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <PlayLogo
+                      src={`/static/logos/logo_${play.awayTeam.name.toLowerCase()}.svg`}
+                    />
+                    <PlayTitle>
+                      {play.result.eventTypeId === 'PERIOD_START'
+                        ? 'Start'
+                        : 'End'}{' '}
+                      of {play.about.ordinalNum} Period
+                    </PlayTitle>
+                    <PlayLogo
+                      src={`/static/logos/logo_${play.homeTeam.name.toLowerCase()}.svg`}
+                    />
+                  </Fragment>
+                )}
+              </Play>
+            );
+          })}
         </PlayList>
       </Container>
     );
