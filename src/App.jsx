@@ -40,6 +40,40 @@ const teams = {
   54: 'VGK'
 };
 
+const subreddits = {
+  '/r/anaheimducks': 'ana',
+  '/r/bostonbruins': 'bos',
+  '/r/sabres': 'buf',
+  '/r/calgaryflames': 'cgy',
+  '/r/canes': 'car',
+  '/r/hawks': 'chi',
+  '/r/coloradoavalanche': 'col',
+  '/r/bluejackets': 'cbj',
+  '/r/dallasstars': 'dal',
+  '/r/detroitredwings': 'det',
+  '/r/edmontonoilers': 'edm',
+  '/r/floridapanthers': 'fla',
+  '/r/losangeleskings': 'lak',
+  '/r/wildhockey': 'min',
+  '/r/habs': 'mtl',
+  '/r/goldenknights': 'vgk',
+  '/r/predators': 'nsh',
+  '/r/devils': 'njd',
+  '/r/newyorkislanders': 'nyi',
+  '/r/rangers': 'nyr',
+  '/r/ottawasenators': 'ott',
+  '/r/flyers': 'phi',
+  '/r/coyotes': 'ari',
+  '/r/penguins': 'pit',
+  '/r/sanjosesharks': 'sjs',
+  '/r/stlouisblues': 'stl',
+  '/r/tampabaylightning': 'tbl',
+  '/r/leafs': 'tor',
+  '/r/canucks': 'van',
+  '/r/caps': 'wsh',
+  '/r/winnipegjets': 'wpg'
+};
+
 const logos = {
   ANA: {
     common: css`
