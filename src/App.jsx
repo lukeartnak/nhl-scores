@@ -44,7 +44,7 @@ const logos = {
   ANA: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_ana.svg);
+      background-image: url(logos/logo_ana.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -57,7 +57,7 @@ const logos = {
   ARI: {
     common: css`
       background-size: 175%;
-      background-image: url(/logos/logo_ari.svg);
+      background-image: url(logos/logo_ari.svg);
     `,
     away: css`
       background-position: 100% 25%;
@@ -70,7 +70,7 @@ const logos = {
   BOS: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_bos.svg);
+      background-image: url(logos/logo_bos.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -82,7 +82,7 @@ const logos = {
   BUF: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_buf.svg);
+      background-image: url(logos/logo_buf.svg);
     `,
     away: css`
       background-position: 0 40%;
@@ -95,7 +95,7 @@ const logos = {
   CAR: {
     common: css`
       background-size: 175%;
-      background-image: url(/logos/logo_car.svg);
+      background-image: url(logos/logo_car.svg);
     `,
     away: css`
       background-position: 100% 30%;
@@ -108,7 +108,7 @@ const logos = {
   CBJ: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_cbj.svg);
+      background-image: url(logos/logo_cbj.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -121,7 +121,7 @@ const logos = {
   CGY: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_cgy.svg);
+      background-image: url(logos/logo_cgy.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -134,7 +134,7 @@ const logos = {
   CHI: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_chi.svg);
+      background-image: url(logos/logo_chi.svg);
     `,
     away: css`
       background-position: 0 50%;
@@ -147,7 +147,7 @@ const logos = {
   COL: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_col.svg);
+      background-image: url(logos/logo_col.svg);
     `,
     away: css`
       background-position: 100% 75%;
@@ -160,7 +160,7 @@ const logos = {
   DAL: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_dal.svg);
+      background-image: url(logos/logo_dal.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -173,7 +173,7 @@ const logos = {
   DET: {
     common: css`
       background-size: 160%;
-      background-image: url(/logos/logo_det.svg);
+      background-image: url(logos/logo_det.svg);
     `,
     away: css`
       background-position: 0 60%;
@@ -186,7 +186,7 @@ const logos = {
   EDM: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_edm.svg);
+      background-image: url(logos/logo_edm.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -198,7 +198,7 @@ const logos = {
   FLA: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_fla.svg);
+      background-image: url(logos/logo_fla.svg);
     `,
     away: css`
       background-position: 0 40%;
@@ -211,7 +211,7 @@ const logos = {
   LAK: {
     common: css`
       background-size: 100%;
-      background-image: url(/logos/logo_lak.svg);
+      background-image: url(logos/logo_lak.svg);
     `,
     away: css`
       background-position: 100% 25%;
@@ -223,7 +223,7 @@ const logos = {
   MIN: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_min.svg);
+      background-image: url(logos/logo_min.svg);
     `,
     away: css`
       background-position: 0 50%;
@@ -236,7 +236,7 @@ const logos = {
   MTL: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_mtl.svg);
+      background-image: url(logos/logo_mtl.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -249,7 +249,7 @@ const logos = {
   NJD: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_njd.svg);
+      background-image: url(logos/logo_njd.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -261,7 +261,7 @@ const logos = {
   NSH: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_nsh.svg);
+      background-image: url(logos/logo_nsh.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -274,7 +274,7 @@ const logos = {
   NYI: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_nyi.svg);
+      background-image: url(logos/logo_nyi.svg);
     `,
     away: css`
       background-position: 100% 40%;
@@ -286,7 +286,7 @@ const logos = {
   NYR: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_nyr.svg);
+      background-image: url(logos/logo_nyr.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -298,7 +298,7 @@ const logos = {
   OTT: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_ott.svg);
+      background-image: url(logos/logo_ott.svg);
     `,
     away: css`
       background-position: 100% 75%;
@@ -311,7 +311,7 @@ const logos = {
   PHI: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_phi.svg);
+      background-image: url(logos/logo_phi.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -324,7 +324,7 @@ const logos = {
   PIT: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_pit.svg);
+      background-image: url(logos/logo_pit.svg);
     `,
     away: css`
       background-position: 0 20%;
@@ -337,7 +337,7 @@ const logos = {
   SJS: {
     common: css`
       background-size: 150%;
-      background-image: url(/logos/logo_sjs.svg);
+      background-image: url(logos/logo_sjs.svg);
     `,
     away: css`
       background-position: 100% 75%;
@@ -350,7 +350,7 @@ const logos = {
   STL: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_stl.svg);
+      background-image: url(logos/logo_stl.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -363,7 +363,7 @@ const logos = {
   TBL: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_tbl.svg);
+      background-image: url(logos/logo_tbl.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -375,7 +375,7 @@ const logos = {
   TOR: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_tor.svg);
+      background-image: url(logos/logo_tor.svg);
     `,
     away: css`
       background-position: 100% 75%;
@@ -387,7 +387,7 @@ const logos = {
   VAN: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_van.svg);
+      background-image: url(logos/logo_van.svg);
     `,
     away: css`
       background-position: 100% 75%;
@@ -400,7 +400,7 @@ const logos = {
   VGK: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_vgk.svg);
+      background-image: url(logos/logo_vgk.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -413,7 +413,7 @@ const logos = {
   WPG: {
     common: css`
       background-size: 125%;
-      background-image: url(/logos/logo_wpg.svg);
+      background-image: url(logos/logo_wpg.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -426,7 +426,7 @@ const logos = {
   WSH: {
     common: css`
       background-size: 110%;
-      background-image: url(/logos/logo_wsh.svg);
+      background-image: url(logos/logo_wsh.svg);
     `,
     away: css`
       background-position: 100% 50%;
@@ -726,7 +726,7 @@ export default class App extends Component {
           roundLabel: `Round ${game.series.round.number}`,
           gameLabel: game.gameLabel,
           seriesLabel: game.seriesStatusShort || 'Tied 0-0',
-          status: parseInt(game.status.statusCode),
+          status: parseInt(game.status.statusCode, 10),
           period: game.linescore.currentPeriodOrdinal,
           time: game.linescore.currentPeriodTimeRemaining,
           stopped:
@@ -810,7 +810,7 @@ export default class App extends Component {
               title.includes(game.awayTeam.nameFull.toLowerCase()) ||
               title.includes(game.homeTeam.nameFull.toLowerCase())
             );
-          }).data[1].data.children
+          })
         }),
         {}
       )
@@ -922,7 +922,7 @@ export default class App extends Component {
                 {['GOAL', 'PENALTY'].includes(play.result.eventTypeId) ? (
                   <Fragment>
                     <PlayLogo
-                      src={`/logos/logo_${teams[
+                      src={`logos/logo_${teams[
                         play.team.id
                       ].toLowerCase()}.svg`}
                     />
@@ -950,7 +950,7 @@ export default class App extends Component {
                 ) : (
                   <Fragment>
                     <PlayLogo
-                      src={`/logos/logo_${play.awayTeam.name.toLowerCase()}.svg`}
+                      src={`logos/logo_${play.awayTeam.name.toLowerCase()}.svg`}
                     />
                     <PlayTitle>
                       {play.result.eventTypeId === 'PERIOD_START'
@@ -959,7 +959,7 @@ export default class App extends Component {
                       of {play.about.ordinalNum} Period
                     </PlayTitle>
                     <PlayLogo
-                      src={`/logos/logo_${play.homeTeam.name.toLowerCase()}.svg`}
+                      src={`logos/logo_${play.homeTeam.name.toLowerCase()}.svg`}
                     />
                   </Fragment>
                 )}
@@ -971,9 +971,9 @@ export default class App extends Component {
           {this.state.games
             .filter(game => this.state.comments[game.id])
             .map(game =>
-              this.state.comments[game.id].slice(
+              this.state.comments[game.id].data[1].data.children.slice(
                 0,
-                this.state.comments[game.id].length - 1
+                this.state.comments[game.id].data[1].data.children.length - 1
               )
             )
             .map(comments =>
@@ -983,10 +983,10 @@ export default class App extends Component {
                     <CommentLogo
                       src={
                         /([A-Z]{3}) - NHL/.test(comment.data.author_flair_text)
-                          ? `/logos/logo_${/([A-Z]{3}) - NHL/
+                          ? `logos/logo_${/([A-Z]{3}) - NHL/
                               .exec(comment.data.author_flair_text)[1]
                               .toLowerCase()}.svg`
-                          : '/logos/logo_nhl.svg'
+                          : 'logos/logo_nhl.svg'
                       }
                     />
                     <CommentBody>
