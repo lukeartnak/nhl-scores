@@ -26,6 +26,10 @@ export default class MyDocument extends Document {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Oswald:200,300,400,500,600,700"
           />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500"
+          />
           {this.props.styleTags}
         </Head>
         <body>

@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import axios from 'axios';
 import moment from 'moment';
+import decode from 'decode-html';
 
 axios.defaults.baseURL = 'https://statsapi.web.nhl.com/';
 
@@ -455,13 +456,18 @@ const UpdateTimer = styled.div`
 
 const Container = styled.div`
   min-height: 100vh;
-  display: flex;
-  padding: 16px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-areas: auto auto;
+  grid-template-areas:
+    'game-list play-list'
+    'comment-list play-list';
+  grid-gap: 16px;
+  margin: 16px;
 `;
 
 const GameList = styled.div`
-  width: 960px;
-  margin-right: 16px;
+  grid-area: game-list;
 
   > * + * {
     margin-top: 16px;
@@ -469,13 +475,17 @@ const GameList = styled.div`
 `;
 
 const PlayList = styled.div`
-  flex: 1;
+  grid-area: play-list;
   display: flex;
   flex-direction: column;
 
   > * + * {
     margin-top: 16px;
   }
+`;
+
+const CommentList = styled.div`
+  grid-area: comment-list;
 `;
 
 const themes = {
@@ -612,19 +622,61 @@ const GameClock = styled.span`
 const GameSpecial = styled.span`
   display: flex;
   flex-direction: column;
-  margin-top: 24px;
   font-size: 18px;
   line-height: 1.6;
 
   ${TeamColumn} & {
     width: 80px;
     text-align: center;
-    margin-top: 0;
     position: absolute;
     top: 50%;
     ${props => (props.away ? 'right: 16px' : 'left: 16px')};
     transform: translateY(-50%);
   }
+`;
+
+const Comment = styled.div`
+  display: flex;
+  align-items: flex-start;
+  background: #ffffff;
+  padding: 16px;
+  font-family: 'Roboto';
+
+  em {
+    font-style: italic;
+  }
+
+  strong {
+    font-weight: 500;
+  }
+
+  a {
+    color: #0099ff;
+    text-decoration: none;
+  }
+`;
+
+const CommentLogo = styled.img`
+  flex-basis: 48px;
+  max-height: 32px;
+  max-width: 32px;
+  margin-right: 16px;
+`;
+
+const CommentBody = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const CommentText = styled.div`
+  line-height: 1.6;
+`;
+
+const CommentAuthor = styled.span`
+  font-weight: 500;
+  font-size: 12px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
 `;
 
 function formatMinutes(minutes) {
@@ -636,12 +688,15 @@ function formatMinutes(minutes) {
 export default class extends Component {
   state = {
     games: [],
-    plays: []
+    plays: [],
+    comments: []
   };
 
   async componentDidMount() {
-    this.fetchGames();
     setInterval(this.fetchGames, 1000 * 15);
+    setInterval(this.fetchComments, 1000 * 60);
+    await this.fetchGames();
+    this.fetchComments();
   }
 
   fetchGames = async () => {
@@ -651,10 +706,6 @@ export default class extends Component {
     const scheduledGames = scheduleResponse.data.dates.reduce(
       (acc, date) => acc.concat(date.games),
       []
-    );
-
-    const redditResponse = await axios.get(
-      'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22+OR+flair%3A%22%5BGDT+Playoffs%5D%22&restrict_sr=on&sort=new&t=day'
     );
     const gameResponses = await Promise.all(
       scheduledGames.map(game => axios.get(game.link))
@@ -666,18 +717,12 @@ export default class extends Component {
       ...gameResponse.data.gameData,
       ...gameResponse.data.liveData
     }));
-    const posts = redditResponse.data.data.children.map(post => post.data);
 
     this.setState({
       games: games.map(game => {
         return {
           id: game.id,
           date: moment(game.datetime.dateTime),
-          gdt: posts.find(
-            post =>
-              post.title.includes(game.teams.away.name) &&
-              post.title.includes(game.teams.home.name)
-          ),
           roundLabel: `Round ${game.series.round.number}`,
           gameLabel: game.gameLabel,
           seriesLabel: game.seriesStatusShort || 'Tied 0-0',
@@ -698,6 +743,7 @@ export default class extends Component {
             game.linescore.powerPlayInfo &&
             formatMinutes(game.linescore.powerPlayInfo.situationTimeRemaining),
           homeTeam: {
+            nameFull: game.teams.home.name,
             name: game.teams.home.abbreviation,
             goals: game.linescore.teams.home.goals,
             shots: game.linescore.teams.home.shotsOnGoal,
@@ -705,6 +751,7 @@ export default class extends Component {
             emptyNet: game.linescore.teams.home.goaliePulled
           },
           awayTeam: {
+            nameFull: game.teams.away.name,
             name: game.teams.away.abbreviation,
             goals: game.linescore.teams.away.goals,
             shots: game.linescore.teams.away.shotsOnGoal,
@@ -739,6 +786,34 @@ export default class extends Component {
           []
         )
         .sort((a, b) => moment(b.about.dateTime).diff(a.about.dateTime))
+    });
+  };
+
+  fetchComments = async () => {
+    const redditResponse = await axios.get(
+      'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22+OR+flair%3A%22%5BGDT+Playoffs%5D%22&restrict_sr=on&sort=new&t=day'
+    );
+
+    const commentResponses = await Promise.all(
+      redditResponse.data.data.children.map(post =>
+        axios.get(`https://www.reddit.com/comments/${post.data.id}.json`)
+      )
+    );
+
+    this.setState({
+      comments: this.state.games.reduce(
+        (acc, game) => ({
+          ...acc,
+          [game.id]: commentResponses.find(commentResponse => {
+            const title = commentResponse.data[0].data.children[0].data.title.toLowerCase();
+            return (
+              title.includes(game.awayTeam.nameFull.toLowerCase()) ||
+              title.includes(game.homeTeam.nameFull.toLowerCase())
+            );
+          }).data[1].data.children
+        }),
+        {}
+      )
     });
   };
 
@@ -861,6 +936,7 @@ export default class extends Component {
                           play.result.secondaryType,
                           play.result.secondaryType.toLowerCase()
                         )
+                        .replace('deflected', 'deflection')
                         .replace(
                           'interference - goalkeeper',
                           'goaltender interference'
@@ -891,6 +967,41 @@ export default class extends Component {
             );
           })}
         </PlayList>
+        <CommentList>
+          {this.state.games
+            .filter(game => this.state.comments[game.id])
+            .map(game =>
+              this.state.comments[game.id].slice(
+                0,
+                this.state.comments[game.id].length - 1
+              )
+            )
+            .map(comments =>
+              comments.map(comment => {
+                return (
+                  <Comment key={comment.data.id}>
+                    <CommentLogo
+                      src={
+                        /([A-Z]{3}) - NHL/.test(comment.data.author_flair_text)
+                          ? `/static/logos/logo_${/([A-Z]{3}) - NHL/
+                              .exec(comment.data.author_flair_text)[1]
+                              .toLowerCase()}.svg`
+                          : '/static/logos/logo_nhl.svg'
+                      }
+                    />
+                    <CommentBody>
+                      <CommentAuthor>{comment.data.author}</CommentAuthor>
+                      <CommentText
+                        dangerouslySetInnerHTML={{
+                          __html: decode(comment.data.body_html)
+                        }}
+                      />
+                    </CommentBody>
+                  </Comment>
+                );
+              })
+            )}
+        </CommentList>
       </Container>
     );
   }
