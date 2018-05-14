@@ -642,6 +642,17 @@ const Comment = styled.div`
   padding: 16px;
   font-family: 'Roboto';
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
   em {
     font-style: italic;
   }
@@ -653,6 +664,26 @@ const Comment = styled.div`
   a {
     color: #0099ff;
     text-decoration: none;
+  }
+
+  table {
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  thead {
+    background: #4a4a4a;
+    color: #ffffff;
+  }
+
+  tbody {
+    background: #fafafa;
+  }
+
+  th,
+  td {
+    padding: 8px;
   }
 `;
 
@@ -982,8 +1013,10 @@ export default class App extends Component {
                   <Comment key={comment.data.id}>
                     <CommentLogo
                       src={
-                        /([A-Z]{3}) - NHL/.test(comment.data.author_flair_text)
-                          ? `logos/logo_${/([A-Z]{3}) - NHL/
+                        /([A-Z]{3}) - (NHL|Bandwagon)/.test(
+                          comment.data.author_flair_text
+                        )
+                          ? `logos/logo_${/([A-Z]{3}) - (NHL|Bandwagon)/
                               .exec(comment.data.author_flair_text)[1]
                               .toLowerCase()}.svg`
                           : 'logos/logo_nhl.svg'
