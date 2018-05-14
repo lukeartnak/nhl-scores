@@ -641,6 +641,7 @@ const Comment = styled.div`
   background: #ffffff;
   padding: 16px;
   font-family: 'Roboto';
+  font-size: 14px;
 
   h1,
   h2,
@@ -648,7 +649,7 @@ const Comment = styled.div`
   h4,
   h5,
   h6 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     margin-bottom: 8px;
   }
