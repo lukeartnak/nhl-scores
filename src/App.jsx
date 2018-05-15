@@ -740,7 +740,7 @@ const CommentText = styled.div`
 
 const CommentAuthor = styled.span`
   font-weight: 500;
-  font-size: 12px;
+  font-size: 10px;
   margin-bottom: 4px;
   text-transform: uppercase;
 `;
