@@ -61,14 +61,18 @@ export class Application extends Component {
       this.setState({ pgts }, () => refreshComments());
     };
 
-    const refreshComments = () => {
+    const refreshComments = async () => {
       const { gdts, pgts } = this.state;
-      pgts.concat(gdts).forEach(async ({ id }) => {
-        const comments = await fetchComments(id);
-        this.setState(state => ({
-          commentsById: { ...state.commentsById, [id]: comments }
-        }));
-      });
+      const threads = pgts.concat(gdts);
+      const comments = await Promise.all(
+        threads.map(thread => fetchComments(thread.id))
+      );
+      this.setState(state => ({
+        commentsById: comments.reduce(
+          (acc, comment, i) => ({ ...acc, [threads[i].id]: comment }),
+          state.commentsById
+        )
+      }));
     };
 
     refreshGames();
@@ -84,16 +88,14 @@ export class Application extends Component {
   render() {
     const { games, gdts, pgts, commentsById, selectedGameId } = this.state;
     const game = games.find(game => game.id === selectedGameId);
-    const gdt = game
+    const thread = game
       ? pgts
           .concat(gdts)
           .find(
-            ({ title }) =>
+            ({ title, date }) =>
               title.includes(game.home.name) &&
               title.includes(game.away.name) &&
-              title.includes(game.date.format('D')) &&
-              title.includes(game.date.format('MMM')) &&
-              title.includes(game.date.format('YYYY'))
+              Math.abs(date.diff(game.date, 'minutes')) < 720
           ) || {}
       : {};
 
@@ -105,7 +107,9 @@ export class Application extends Component {
           selectedGameId={selectedGameId}
           onSelectGame={selectedGameId => this.setState({ selectedGameId })}
         />
-        {game && <GameView {...game} comments={commentsById[gdt.id] || []} />}
+        {game && (
+          <GameView {...game} comments={commentsById[thread.id] || []} />
+        )}
       </ApplicationWrapper>
     );
   }

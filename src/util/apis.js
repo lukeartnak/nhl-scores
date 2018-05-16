@@ -35,7 +35,7 @@ function formatMinutes(minutes) {
 
 export async function fetchUpcomingGames() {
   const startDate = moment()
-    .subtract(1, 'days')
+    .subtract(2, 'days')
     .format('YYYY-MM-DD');
   const endDate = moment()
     .add(7, 'days')
@@ -173,19 +173,24 @@ async function fetchGame({ gamePk, seriesSummary }) {
   };
 }
 
+function formatGameThread(thread) {
+  return {
+    id: thread.id,
+    date: moment(thread.created * 1000),
+    title: thread.title
+  };
+}
+
 export async function fetchGameThreads() {
   const {
     data: {
       data: { children }
     }
   } = await axios.get(
-    'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22+OR+flair%3A%22%5BGDT+Playoffs%5D%22&restrict_sr=on&sort=new&t=week'
+    'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22&restrict_sr=on&sort=new&t=month'
   );
 
-  return children.map(child => ({
-    id: child.data.id,
-    title: child.data.title
-  }));
+  return children.map(child => formatGameThread(child.data));
 }
 
 export async function fetchPostgameThreads() {
@@ -194,13 +199,10 @@ export async function fetchPostgameThreads() {
       data: { children }
     }
   } = await axios.get(
-    'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BPGT%5D%22&restrict_sr=on&sort=new&t=week'
+    'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BPGT%5D%22&restrict_sr=on&sort=new&t=month'
   );
 
-  return children.map(child => ({
-    id: child.data.id,
-    title: child.data.title
-  }));
+  return children.map(child => formatGameThread(child.data));
 }
 
 function formatComment(comment) {

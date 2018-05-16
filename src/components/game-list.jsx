@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
+import moment from 'moment';
 
 const GameListWrapper = styled.div`
   grid-area: game-list;
@@ -10,7 +11,12 @@ const GameListWrapper = styled.div`
 
 const selected = css`
   cursor: pointer;
-  border-top: 2px solid #4a4a4a;
+  border-top: 3px solid #4a4a4a;
+`;
+
+const disabled = css`
+  cursor: normal;
+  pointer-events: none;
 `;
 
 const GameWrapper = styled.div`
@@ -19,7 +25,7 @@ const GameWrapper = styled.div`
   border-right: 1px solid #eee;
 
   ${props => props.selected && selected};
-
+  ${props => props.disabled && disabled};
   &:hover {
     ${selected};
   }
@@ -70,7 +76,11 @@ function Game({ id, date, home, away, status, selected, onSelect }) {
   const showIntermission =
     status.started && !status.ended && status.intermission;
   return (
-    <GameWrapper onClick={() => onSelect(id)} selected={selected}>
+    <GameWrapper
+      onClick={() => onSelect(id)}
+      selected={selected}
+      disabled={date.diff(moment(), 'minutes') > 60}
+    >
       <TeamColumn team={away.code}>
         <TeamName>{away.code}</TeamName>
         <TeamGoals>{away.goals}</TeamGoals>
