@@ -173,36 +173,26 @@ async function fetchGame({ gamePk, seriesSummary }) {
   };
 }
 
-function formatGameThread(thread) {
-  return {
-    id: thread.id,
-    date: moment(thread.created * 1000),
-    title: thread.title
-  };
-}
-
-export async function fetchGameThreads() {
+export async function fetchGameThreads(games) {
   const {
     data: {
       data: { children }
     }
   } = await axios.get(
-    'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22&restrict_sr=on&sort=new&t=month'
+    `https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22+OR+flair%3A%22%5BPGT%5D%22&restrict_sr=on&sort=new&t=month`
   );
 
-  return children.map(child => formatGameThread(child.data));
-}
-
-export async function fetchPostgameThreads() {
-  const {
-    data: {
-      data: { children }
-    }
-  } = await axios.get(
-    'https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BPGT%5D%22&restrict_sr=on&sort=new&t=month'
-  );
-
-  return children.map(child => formatGameThread(child.data));
+  return children.reduce((acc, child) => {
+    const { id, title, created } = child.data;
+    const game = games.find(game => {
+      return (
+        title.includes(game.home.name) &&
+        title.includes(game.away.name) &&
+        Math.abs(moment(created * 1000).diff(game.date, 'minutes')) < 720
+      );
+    });
+    return game ? acc.concat({ id, game: game.id }) : acc;
+  }, []);
 }
 
 function formatComment(comment) {

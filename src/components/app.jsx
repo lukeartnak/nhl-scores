@@ -3,7 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import {
   fetchUpcomingGames,
   fetchGameThreads,
-  fetchPostgameThreads,
   fetchComments
 } from '../util/apis';
 
@@ -42,28 +41,24 @@ const RefreshTimer = styled.div`
 export class Application extends Component {
   state = {
     games: [],
-    gdts: [],
-    pgts: [],
+    threads: [],
     commentsById: {},
     selectedGameId: null
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const refreshGames = async () => {
       const games = await fetchUpcomingGames();
       this.setState({ games });
     };
 
     const refreshGameThreads = async () => {
-      const gdts = await fetchGameThreads();
-      this.setState({ gdts }, () => refreshComments());
-      const pgts = await fetchPostgameThreads();
-      this.setState({ pgts }, () => refreshComments());
+      const threads = await fetchGameThreads(this.state.games);
+      this.setState({ threads });
     };
 
     const refreshComments = async () => {
-      const { gdts, pgts } = this.state;
-      const threads = pgts.concat(gdts);
+      const { threads } = this.state;
       const comments = await Promise.all(
         threads.map(thread => fetchComments(thread.id))
       );
@@ -75,29 +70,19 @@ export class Application extends Component {
       }));
     };
 
-    refreshGames();
     setInterval(() => refreshGames(), 1000 * 15);
-
-    refreshGameThreads();
     setInterval(() => refreshGameThreads(), 1000 * 60);
-
-    refreshComments();
     setInterval(() => refreshComments(), 1000 * 30);
+
+    await refreshGames();
+    await refreshGameThreads();
+    refreshComments();
   }
 
   render() {
-    const { games, gdts, pgts, commentsById, selectedGameId } = this.state;
-    const game = games.find(game => game.id === selectedGameId);
-    const thread = game
-      ? pgts
-          .concat(gdts)
-          .find(
-            ({ title, date }) =>
-              title.includes(game.home.name) &&
-              title.includes(game.away.name) &&
-              Math.abs(date.diff(game.date, 'minutes')) < 720
-          ) || {}
-      : {};
+    const { games, threads, commentsById, selectedGameId } = this.state;
+    const game = games.find(game => game.id === selectedGameId) || {};
+    const thread = threads.find(t => t.game === game.id) || {};
 
     return (
       <ApplicationWrapper>
@@ -107,7 +92,7 @@ export class Application extends Component {
           selectedGameId={selectedGameId}
           onSelectGame={selectedGameId => this.setState({ selectedGameId })}
         />
-        {game && (
+        {game.id && (
           <GameView {...game} comments={commentsById[thread.id] || []} />
         )}
       </ApplicationWrapper>
