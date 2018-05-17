@@ -335,7 +335,7 @@ export function GameView({ date, title, home, away, status, plays, comments }) {
         ))}
       </PlaysSection>
       <CommentsSection>
-        {comments.map(comment => (
+        {comments.slice(0, 20).map(comment => (
           <Comment key={comment.id}>
             <CommentLogo team={comment.team} />
             <CommentBody>
