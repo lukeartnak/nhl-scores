@@ -35,10 +35,10 @@ function formatMinutes(minutes) {
 
 export async function fetchUpcomingGames() {
   const startDate = moment()
-    .subtract(2, 'days')
+    .subtract(1, 'days')
     .format('YYYY-MM-DD');
   const endDate = moment()
-    .add(7, 'days')
+    .add(1, 'days')
     .format('YYYY-MM-DD');
   const { data } = await axios.get(
     `https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.game.seriesSummary,seriesSummary.series&startDate=${startDate}&endDate=${endDate}`
@@ -104,7 +104,7 @@ async function fetchGame({ gamePk, seriesSummary }) {
   return {
     id: gamePk,
     date: moment(dateTime),
-    title: `Round ${seriesSummary.series.round.number} - ${
+    title: seriesSummary && `Round ${seriesSummary.series.round.number} - ${
       seriesSummary.gameLabel
     } - ${seriesSummary.seriesStatusShort || 'Tied 0-0'}`,
     away: {
