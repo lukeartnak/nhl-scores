@@ -1,47 +1,42 @@
-import axios from 'axios';
-import moment from 'moment';
-import decode from 'decode-html';
+import axios from "axios";
+import moment from "moment";
+import decode from "decode-html";
 
 const periodNames = {
-  1: '1st Period',
-  2: '2nd Period',
-  3: '3rd Period',
-  4: 'Overtime',
-  5: 'Double Overtime',
-  6: 'Triple Overtime'
+  1: "1st Period",
+  2: "2nd Period",
+  3: "3rd Period",
+  4: "Overtime",
+  5: "Double Overtime",
+  6: "Triple Overtime"
 };
 
 const periodOrdinals = {
-  1: '1st',
-  2: '2nd',
-  3: '3rd',
-  4: 'OT',
-  5: '2OT',
-  6: '3OT'
+  1: "1st",
+  2: "2nd",
+  3: "3rd",
+  4: "OT",
+  5: "2OT",
+  6: "3OT"
 };
 
 const titles = {
-  GAME_START: () => 'Start of Game',
+  GAME_START: () => "Start of Game",
   PERIOD_START: period => `Start of ${period}`,
   PERIOD_END: period => `End of ${period}`,
-  GAME_END: () => 'End of Game'
+  GAME_END: () => "End of Game"
 };
 
 function formatMinutes(minutes) {
   const m = Math.floor(minutes / 60);
   const s = Math.floor(minutes % 60);
-  return `${m}:${('00' + s).slice(-2)}`;
+  return `${m}:${("00" + s).slice(-2)}`;
 }
 
 export async function fetchUpcomingGames() {
-  const startDate = moment()
-    .subtract(1, 'days')
-    .format('YYYY-MM-DD');
-  const endDate = moment()
-    .add(1, 'days')
-    .format('YYYY-MM-DD');
+  const date = moment().format("YYYY-MM-DD");
   const { data } = await axios.get(
-    `https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.game.seriesSummary,seriesSummary.series&startDate=${startDate}&endDate=${endDate}`
+    `https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.game.seriesSummary,seriesSummary.series&startDate=${date}&endDate=${date}`
   );
   return Promise.all(
     data.dates.reduce(
@@ -61,18 +56,18 @@ function formatPlay(play) {
     period: periodOrdinals[play.about.period],
     time: play.about.periodTime,
     title: play.result.description
-      .replace(', assists: none', '')
-      .replace(', assists:', ' assisted by')
-      .replace(/ \(\d+\)/g, '')
-      .replace(', ', ' and ')
+      .replace(", assists: none", "")
+      .replace(", assists:", " assisted by")
+      .replace(/ \(\d+\)/g, "")
+      .replace(", ", " and ")
       .replace(
         play.result.secondaryType,
         play.result.secondaryType.toLowerCase()
       )
-      .replace('delaying game -', 'delaying game by')
-      .replace('delay of game -', 'delaying game by')
-      .replace('deflected', 'deflection')
-      .replace('interference - goalkeeper', 'goaltender interference')
+      .replace("delaying game -", "delaying game by")
+      .replace("delay of game -", "delaying game by")
+      .replace("deflected", "deflection")
+      .replace("interference - goalkeeper", "goaltender interference")
   };
 }
 
@@ -104,9 +99,11 @@ async function fetchGame({ gamePk, seriesSummary }) {
   return {
     id: gamePk,
     date: moment(dateTime),
-    title: seriesSummary && `Round ${seriesSummary.series.round.number} - ${
-      seriesSummary.gameLabel
-    } - ${seriesSummary.seriesStatusShort || 'Tied 0-0'}`,
+    title:
+      seriesSummary &&
+      `Round ${seriesSummary.series.round.number} - ${
+        seriesSummary.gameLabel
+      } - ${seriesSummary.seriesStatusShort || "Tied 0-0"}`,
     away: {
       name: away.team.name,
       code: away.team.abbreviation,
@@ -123,18 +120,18 @@ async function fetchGame({ gamePk, seriesSummary }) {
     },
     status: {
       started: allPlays.length > 1,
-      stopped: currentPlay.result.eventTypeId === 'GAME_STOPPAGE',
-      ended: currentPlay.result.eventTypeId === 'GAME_END',
+      stopped: currentPlay.result.eventTypeId === "GAME_STOPPAGE",
+      ended: currentPlay.result.eventTypeId === "GAME_END",
       period: periodNames[currentPeriod],
       periodOrdinal: periodOrdinals[currentPeriod],
       periodClock: currentPeriodTimeRemaining,
       powerplay: !!powerPlayInfo.inSituation,
       powerplaySide:
         home.numSkaters > away.numSkaters
-          ? 'home'
+          ? "home"
           : home.numSkaters < away.numSkaters
-            ? 'away'
-            : 'even',
+          ? "away"
+          : "even",
       powerplayClock:
         powerPlayInfo.inSituation &&
         formatMinutes(powerPlayInfo.situationTimeRemaining),
@@ -146,29 +143,31 @@ async function fetchGame({ gamePk, seriesSummary }) {
     plays: [
       ...scoringPlays.map(i => formatPlay(allPlays[i])),
       ...penaltyPlays.map(i => formatPlay(allPlays[i])),
-      ...allPlays.filter(play => titles[play.result.eventTypeId]).map(play => ({
-        id: play.result.eventCode,
-        date: moment(play.about.dateTime),
-        type: play.result.eventTypeId,
-        title: (() => {
-          switch (play.result.eventTypeId) {
-            case 'PERIOD_START':
-              return `Start of ${periodNames[play.about.period]}`;
-            case 'PERIOD_END':
-              return `End of ${periodNames[play.about.period]}`;
-            case 'GAME_END':
-              const winnerName =
-                away.goals > home.goals
-                  ? away.team.abbreviation
-                  : home.team.abbreviation;
-              const winnerScore = Math.max(away.goals, home.goals);
-              const loserScore = Math.min(away.goals, home.goals);
-              return `${winnerName} wins ${winnerScore}-${loserScore}`;
-            default:
-              return 'Unknown';
-          }
-        })()
-      }))
+      ...allPlays
+        .filter(play => titles[play.result.eventTypeId])
+        .map(play => ({
+          id: play.result.eventCode,
+          date: moment(play.about.dateTime),
+          type: play.result.eventTypeId,
+          title: (() => {
+            switch (play.result.eventTypeId) {
+              case "PERIOD_START":
+                return `Start of ${periodNames[play.about.period]}`;
+              case "PERIOD_END":
+                return `End of ${periodNames[play.about.period]}`;
+              case "GAME_END":
+                const winnerName =
+                  away.goals > home.goals
+                    ? away.team.abbreviation
+                    : home.team.abbreviation;
+                const winnerScore = Math.max(away.goals, home.goals);
+                const loserScore = Math.min(away.goals, home.goals);
+                return `${winnerName} wins ${winnerScore}-${loserScore}`;
+              default:
+                return "Unknown";
+            }
+          })()
+        }))
     ].sort((a, b) => b.date.diff(a.date))
   };
 }
@@ -188,7 +187,7 @@ export async function fetchGameThreads(games) {
       return (
         title.includes(game.home.name) &&
         title.includes(game.away.name) &&
-        Math.abs(moment(created * 1000).diff(game.date, 'minutes')) < 720
+        Math.abs(moment(created * 1000).diff(game.date, "minutes")) < 720
       );
     });
     return game ? acc.concat({ id, game: game.id }) : acc;
@@ -202,7 +201,7 @@ function formatComment(comment) {
     author: comment.author,
     team: flairPattern.test(comment.author_flair_text)
       ? flairPattern.exec(comment.author_flair_text)[1]
-      : 'nhl',
+      : "nhl",
     body: decode(comment.body_html)
   };
 }
