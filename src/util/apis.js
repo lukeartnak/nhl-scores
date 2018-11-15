@@ -185,13 +185,17 @@ export async function fetchGameThreads(games) {
     const { id, title, created } = child.data;
     const game = games.find(game => {
       return (
-        title.includes(game.home.name) &&
-        title.includes(game.away.name) &&
+        stripNonAlpha(title).includes(stripNonAlpha(game.home.name)) &&
+        stripNonAlpha(title).includes(stripNonAlpha(game.away.name)) &&
         Math.abs(moment(created * 1000).diff(game.date, "minutes")) < 720
       );
     });
     return game ? acc.concat({ id, game: game.id }) : acc;
   }, []);
+}
+
+function stripNonAlpha(string) {
+  return string.replace(/[^a-zA-Z]/g, "");
 }
 
 function formatComment(comment) {
