@@ -75,7 +75,8 @@ async function fetchGame({ gamePk, seriesSummary }) {
   const {
     data: {
       gameData: {
-        datetime: { dateTime }
+        datetime: { dateTime },
+        teams: { away, home }
       },
       liveData: {
         plays: {
@@ -87,7 +88,10 @@ async function fetchGame({ gamePk, seriesSummary }) {
         linescore: {
           currentPeriod,
           currentPeriodTimeRemaining,
-          teams: { away, home },
+          teams: {
+            away: { goals: awayGoals },
+            home: { goals: homeGoals }
+          },
           intermissionInfo = {},
           powerPlayInfo = {}
         }
@@ -96,6 +100,7 @@ async function fetchGame({ gamePk, seriesSummary }) {
   } = await axios.get(
     `https://statsapi.web.nhl.com/api/v1/game/${gamePk}/feed/live`
   );
+  console.log(away);
   return {
     id: gamePk,
     date: moment(dateTime),
@@ -105,16 +110,18 @@ async function fetchGame({ gamePk, seriesSummary }) {
         seriesSummary.gameLabel
       } - ${seriesSummary.seriesStatusShort || "Tied 0-0"}`,
     away: {
-      name: away.team.name,
-      code: away.team.abbreviation,
-      goals: away.goals,
+      name: away.name,
+      teamName: away.teamName,
+      code: away.abbreviation,
+      goals: awayGoals,
       shots: away.shotsOnGoal,
       skaters: away.numSkaters
     },
     home: {
-      name: home.team.name,
-      code: home.team.abbreviation,
-      goals: home.goals,
+      name: home.name,
+      teamName: home.teamName,
+      code: home.abbreviation,
+      goals: homeGoals,
       shots: home.shotsOnGoal,
       skaters: home.numSkaters
     },
@@ -158,8 +165,8 @@ async function fetchGame({ gamePk, seriesSummary }) {
               case "GAME_END":
                 const winnerName =
                   away.goals > home.goals
-                    ? away.team.abbreviation
-                    : home.team.abbreviation;
+                    ? away.abbreviation
+                    : home.abbreviation;
                 const winnerScore = Math.max(away.goals, home.goals);
                 const loserScore = Math.min(away.goals, home.goals);
                 return `${winnerName} wins ${winnerScore}-${loserScore}`;
@@ -184,18 +191,15 @@ export async function fetchGameThreads(games) {
   return children.reduce((acc, child) => {
     const { id, title, created } = child.data;
     const game = games.find(game => {
+      console.log(game.home.teamName, game.away.teamName);
       return (
-        stripNonAlpha(title).includes(stripNonAlpha(game.home.name)) &&
-        stripNonAlpha(title).includes(stripNonAlpha(game.away.name)) &&
+        title.includes(game.home.teamName) &&
+        title.includes(game.away.teamName) &&
         Math.abs(moment(created * 1000).diff(game.date, "minutes")) < 720
       );
     });
     return game ? acc.concat({ id, game: game.id }) : acc;
   }, []);
-}
-
-function stripNonAlpha(string) {
-  return string.replace(/[^a-zA-Z]/g, "");
 }
 
 function formatComment(comment) {
