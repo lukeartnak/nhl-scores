@@ -89,8 +89,16 @@ async function fetchGame({ gamePk, seriesSummary }) {
           currentPeriod,
           currentPeriodTimeRemaining,
           teams: {
-            away: { goals: awayGoals },
-            home: { goals: homeGoals }
+            away: {
+              goals: awayGoals,
+              numSkaters: awaySkaters,
+              shotsOnGoal: awayShots
+            },
+            home: {
+              goals: homeGoals,
+              numSkaters: homeSkaters,
+              shotsOnGoal: homeShots
+            }
           },
           intermissionInfo = {},
           powerPlayInfo = {}
@@ -114,16 +122,16 @@ async function fetchGame({ gamePk, seriesSummary }) {
       teamName: away.teamName,
       code: away.abbreviation,
       goals: awayGoals,
-      shots: away.shotsOnGoal,
-      skaters: away.numSkaters
+      shots: awayShots,
+      skaters: awaySkaters
     },
     home: {
       name: home.name,
       teamName: home.teamName,
       code: home.abbreviation,
       goals: homeGoals,
-      shots: home.shotsOnGoal,
-      skaters: home.numSkaters
+      shots: homeShots,
+      skaters: homeSkaters
     },
     status: {
       started: allPlays.length > 1,
