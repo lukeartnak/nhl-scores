@@ -108,7 +108,7 @@ async function fetchGame({ gamePk, seriesSummary }) {
   } = await axios.get(
     `https://statsapi.web.nhl.com/api/v1/game/${gamePk}/feed/live`
   );
-  console.log(away);
+
   return {
     id: gamePk,
     date: moment(dateTime),
@@ -175,8 +175,9 @@ async function fetchGame({ gamePk, seriesSummary }) {
                   away.goals > home.goals
                     ? away.abbreviation
                     : home.abbreviation;
-                const winnerScore = Math.max(away.goals, home.goals);
-                const loserScore = Math.min(away.goals, home.goals);
+  
+                const winnerScore = Math.max(awayGoals, homeGoals);
+                const loserScore = Math.min(awayGoals, homeGoals);
                 return `${winnerName} wins ${winnerScore}-${loserScore}`;
               default:
                 return "Unknown";
@@ -199,7 +200,6 @@ export async function fetchGameThreads(games) {
   return children.reduce((acc, child) => {
     const { id, title, created } = child.data;
     const game = games.find(game => {
-      console.log(game.home.teamName, game.away.teamName);
       return (
         title.includes(game.home.teamName) &&
         title.includes(game.away.teamName) &&
