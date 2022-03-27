@@ -273,6 +273,17 @@ export const teams = {
       background-position: 0 20%;
     `
   },
+  SEA: {
+    common: css`
+      background-size: 150%;
+    `,
+    away: css`
+      background-position: 50% 20%;
+    `,
+    home: css`
+      background-position: 0 20%;
+    `
+  },
   SJS: {
     common: css`
       background-size: 150%;
