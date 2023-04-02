@@ -172,7 +172,7 @@ async function fetchGame({ gamePk, seriesSummary }) {
                 return `End of ${periodNames[play.about.period]}`;
               case "GAME_END":
                 const winnerName =
-                  away.goals > home.goals
+                  awayGoals > homeGoals
                     ? away.abbreviation
                     : home.abbreviation;
   
