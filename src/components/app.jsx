@@ -21,23 +21,6 @@ const ApplicationWrapper = styled.div`
     'game-view';
 `;
 
-const fill = keyframes`
-  to {
-    max-width: 100vw;
-  }
-`;
-
-const RefreshTimer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 4px;
-  max-width: 0;
-  animation: ${fill} 15s linear infinite;
-  background: #4a4a4a;
-`;
-
 export class Application extends Component {
   state = {
     games: [],
@@ -70,9 +53,9 @@ export class Application extends Component {
       }));
     };
 
-    setInterval(() => refreshGames(), 1000 * 15);
+    setInterval(() => refreshGames(), 1000 * 5);
     setInterval(() => refreshGameThreads(), 1000 * 60);
-    setInterval(() => refreshComments(), 1000 * 30);
+    setInterval(() => refreshComments(), 1000 * 5);
 
     await refreshGames();
     await refreshGameThreads();
@@ -86,7 +69,6 @@ export class Application extends Component {
 
     return (
       <ApplicationWrapper>
-        <RefreshTimer />
         <GameList
           games={games}
           selectedGameId={selectedGameId}
