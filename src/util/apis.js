@@ -62,7 +62,7 @@ function formatPlay(play) {
       .replace(", ", " and ")
       .replace(
         play.result.secondaryType,
-        play.result.secondaryType?.toLowerCase()
+        play.result.secondaryType ? play.result.secondaryType.toLowerCase() : ""
       )
       .replace("delaying game -", "delaying game by")
       .replace("delay of game -", "delaying game by")
