@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
-import styled, { css } from 'styled-components';
-import moment from 'moment';
+import React, { Fragment } from "react";
+import styled, { css } from "styled-components";
+import moment from "moment";
 
 const GameListWrapper = styled.div`
   grid-area: game-list;
@@ -24,8 +24,8 @@ const GameWrapper = styled.div`
   padding: 16px;
   border-right: 1px solid #eee;
 
-  ${props => props.selected && selected};
-  ${props => props.disabled && disabled};
+  ${(props) => props.selected && selected};
+  ${(props) => props.disabled && disabled};
   &:hover {
     ${selected};
   }
@@ -66,7 +66,7 @@ const GameClock = styled.span`
   font-size: 14px;
   font-weight: 300;
 
-  ${props => props.stopped && 'color: #e53935;'};
+  ${(props) => props.stopped && "color: #e53935;"};
 `;
 
 function Game({ id, date, home, away, status, selected, onSelect }) {
@@ -79,7 +79,7 @@ function Game({ id, date, home, away, status, selected, onSelect }) {
     <GameWrapper
       onClick={() => onSelect(id)}
       selected={selected}
-      disabled={date.diff(moment(), 'minutes') > 60}
+      disabled={date.diff(moment(), "minutes") > 60}
     >
       <TeamColumn team={away.code}>
         <TeamName>{away.code}</TeamName>
@@ -88,8 +88,8 @@ function Game({ id, date, home, away, status, selected, onSelect }) {
       <StatusColumn>
         {showDate && (
           <Fragment>
-            <GamePeriod>{date.format('ddd Do')}</GamePeriod>
-            <GameClock>{date.format('h:mm A')}</GameClock>
+            <GamePeriod>{date.format("ddd Do")}</GamePeriod>
+            <GameClock>{date.format("h:mm A")}</GameClock>
           </Fragment>
         )}
         {showPeriod && (
@@ -117,7 +117,7 @@ function Game({ id, date, home, away, status, selected, onSelect }) {
 export function GameList({ games, selectedGameId, onSelectGame }) {
   return (
     <GameListWrapper>
-      {games.map(game => (
+      {games.map((game) => (
         <Game
           key={game.id}
           {...game}

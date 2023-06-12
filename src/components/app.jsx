@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
-import styled from 'styled-components';
+import React, { Component } from "react";
+import styled from "styled-components";
 import {
   fetchUpcomingGames,
   fetchGameThreads,
-  fetchComments
-} from '../util/apis';
+  fetchComments,
+} from "../util/apis";
 
-import { GameList } from './game-list';
-import { GameView } from './game-view';
+import { GameList } from "./game-list";
+import { GameView } from "./game-view";
 
 const ApplicationWrapper = styled.div`
   max-width: 1280px;
@@ -17,8 +17,8 @@ const ApplicationWrapper = styled.div`
   grid-gap: 16px;
   grid-template-rows: 80px auto;
   grid-template-areas:
-    'game-list'
-    'game-view';
+    "game-list"
+    "game-view";
 `;
 
 export class Application extends Component {
@@ -26,12 +26,13 @@ export class Application extends Component {
     games: [],
     threads: [],
     commentsById: {},
-    selectedGameId: null
+    selectedGameId: null,
   };
 
   async componentDidMount() {
     const refreshGames = async () => {
-      const games = await fetchUpcomingGames();
+      const params = new URLSearchParams(window.location.search);
+      const games = await fetchUpcomingGames(params.get("date"));
       this.setState({ games });
     };
 
@@ -43,13 +44,13 @@ export class Application extends Component {
     const refreshComments = async () => {
       const { threads } = this.state;
       const comments = await Promise.all(
-        threads.map(thread => fetchComments(thread.id))
+        threads.map((thread) => fetchComments(thread.id))
       );
-      this.setState(state => ({
+      this.setState((state) => ({
         commentsById: comments.reduce(
           (acc, comment, i) => ({ ...acc, [threads[i].id]: comment }),
           state.commentsById
-        )
+        ),
       }));
     };
 
@@ -64,15 +65,15 @@ export class Application extends Component {
 
   render() {
     const { games, threads, commentsById, selectedGameId } = this.state;
-    const game = games.find(game => game.id === selectedGameId) || {};
-    const thread = threads.find(t => t.game === game.id) || {};
+    const game = games.find((game) => game.id === selectedGameId) || {};
+    const thread = threads.find((t) => t.game === game.id) || {};
 
     return (
       <ApplicationWrapper>
         <GameList
           games={games}
           selectedGameId={selectedGameId}
-          onSelectGame={selectedGameId => this.setState({ selectedGameId })}
+          onSelectGame={(selectedGameId) => this.setState({ selectedGameId })}
         />
         {game.id && (
           <GameView {...game} comments={commentsById[thread.id] || []} />

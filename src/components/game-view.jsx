@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
-import styled, { css } from 'styled-components';
+import React, { Fragment } from "react";
+import styled, { css } from "styled-components";
 
-import { Logo, teams } from './logo';
+import { Logo, teams } from "./logo";
 
 const GameViewWrapper = styled.div`
   grid-area: game-view;
@@ -10,23 +10,23 @@ const GameViewWrapper = styled.div`
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 320px auto;
   grid-template-areas:
-    'boxscore plays'
-    'comments plays';
+    "boxscore plays"
+    "comments plays";
 `;
 
 const BoxscoreSection = styled.section`
-  grid-area: 'boxscore';
+  grid-area: "boxscore";
   position: relative;
   display: flex;
   background: #ffffff;
 `;
 
 const PlaysSection = styled.section`
-  grid-area: 'plays';
+  grid-area: "plays";
 `;
 
 const CommentsSection = styled.section`
-  grid-area: 'comments';
+  grid-area: "comments";
 `;
 
 const GameTitle = styled.div`
@@ -62,11 +62,11 @@ const TeamLogo = styled.div`
   left: 0;
   right: 0;
   opacity: .05;
-  background-image: url('logos/logo_${props =>
+  background-image: url('logos/logo_${(props) =>
     props.team.toLowerCase()}.svg');  
   background-repeat: no-repeat;
-  ${props => teams[props.team].common};
-  ${props => teams[props.team][props.side]};
+  ${(props) => teams[props.team].common};
+  ${(props) => teams[props.team][props.side]};
 `;
 
 const TeamName = styled.span`
@@ -101,7 +101,7 @@ const GameClock = styled.span`
   font-weight: 400;
   line-height: 2;
 
-  ${props => props.stopped && 'color: #e53935;'};
+  ${(props) => props.stopped && "color: #e53935;"};
 `;
 
 const specialTeamStyles = {
@@ -119,7 +119,7 @@ const specialTeamStyles = {
     top: 50%;
     right: 50%;
     transform: translateX(350%) translateY(-50%);
-  `
+  `,
 };
 
 const SpecialTeam = styled.div`
@@ -127,15 +127,15 @@ const SpecialTeam = styled.div`
   flex-direction: column;
   position: absolute;
   font-size: 18px;
-  ${props => specialTeamStyles[props.side]};
+  ${(props) => specialTeamStyles[props.side]};
 `;
 
 const themes = {
-  GOAL: 'rgba(76, 175, 80, 0.1)',
-  PENALTY: 'rgba(244, 67, 54, 0.1)',
-  PERIOD_START: 'rgba(33, 150, 243, .1)',
-  PERIOD_END: 'rgba(33, 150, 243, .1)',
-  GAME_END: 'rgba(255, 193, 7, .2)'
+  GOAL: "rgba(76, 175, 80, 0.1)",
+  PENALTY: "rgba(244, 67, 54, 0.1)",
+  PERIOD_START: "rgba(33, 150, 243, .1)",
+  PERIOD_END: "rgba(33, 150, 243, .1)",
+  GAME_END: "rgba(255, 193, 7, .2)",
 };
 
 const Play = styled.div`
@@ -143,7 +143,7 @@ const Play = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: ${props => themes[props.type]};
+  background: ${(props) => themes[props.type]};
   margin-bottom: 16px;
 `;
 
@@ -181,7 +181,7 @@ const Comment = styled.div`
   align-items: flex-start;
   background: #ffffff;
   padding: 16px;
-  font-family: 'Roboto';
+  font-family: "Roboto";
   font-size: 14px;
 
   h1,
@@ -277,8 +277,8 @@ export function GameView({ date, title, home, away, status, plays, comments }) {
         <StatusColumn>
           {showDate && (
             <Fragment>
-              <GamePeriod>{date.format('ddd Do')}</GamePeriod>
-              <GameClock>{date.format('h:mm A')}</GameClock>
+              <GamePeriod>{date.format("ddd Do")}</GamePeriod>
+              <GameClock>{date.format("h:mm A")}</GameClock>
             </Fragment>
           )}
           {showPeriod && (
@@ -319,7 +319,7 @@ export function GameView({ date, title, home, away, status, plays, comments }) {
         )}
       </BoxscoreSection>
       <PlaysSection>
-        {plays.map(play => (
+        {plays.map((play) => (
           <Play key={play.id} type={play.type}>
             <PlayLogo team={play.team ? play.team : away.code} />
             <PlayTitle>{play.title}</PlayTitle>
@@ -335,7 +335,7 @@ export function GameView({ date, title, home, away, status, plays, comments }) {
         ))}
       </PlaysSection>
       <CommentsSection>
-        {comments.slice(0, 20).map(comment => (
+        {comments.slice(0, 20).map((comment) => (
           <Comment key={comment.id}>
             <CommentLogo team={comment.team} />
             <CommentBody>

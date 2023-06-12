@@ -8,7 +8,7 @@ const periodNames = {
   3: "3rd Period",
   4: "Overtime",
   5: "Double Overtime",
-  6: "Triple Overtime"
+  6: "Triple Overtime",
 };
 
 const periodOrdinals = {
@@ -17,14 +17,14 @@ const periodOrdinals = {
   3: "3rd",
   4: "OT",
   5: "2OT",
-  6: "3OT"
+  6: "3OT",
 };
 
 const titles = {
   GAME_START: () => "Start of Game",
-  PERIOD_START: period => `Start of ${period}`,
-  PERIOD_END: period => `End of ${period}`,
-  GAME_END: () => "End of Game"
+  PERIOD_START: (period) => `Start of ${period}`,
+  PERIOD_END: (period) => `End of ${period}`,
+  GAME_END: () => "End of Game",
 };
 
 function formatMinutes(minutes) {
@@ -33,14 +33,14 @@ function formatMinutes(minutes) {
   return `${m}:${("00" + s).slice(-2)}`;
 }
 
-export async function fetchUpcomingGames() {
-  const date = moment().format("YYYY-MM-DD");
+export async function fetchUpcomingGames(date) {
+  const formattedDate = moment(date || new Date()).format("YYYY-MM-DD");
   const { data } = await axios.get(
-    `https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.game.seriesSummary,seriesSummary.series&startDate=${date}&endDate=${date}`
+    `https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.game.seriesSummary,seriesSummary.series&startDate=${formattedDate}&endDate=${formattedDate}`
   );
   return Promise.all(
     data.dates.reduce(
-      (acc, date) => acc.concat(date.games.map(game => fetchGame(game))),
+      (acc, date) => acc.concat(date.games.map((game) => fetchGame(game))),
       []
     )
   );
@@ -52,7 +52,8 @@ function formatPlay(play) {
     date: moment(play.about.dateTime),
     type: play.result.eventTypeId,
     team: play.team && play.team.triCode,
-    players: play.players && play.players.map(player => player.player.fullName),
+    players:
+      play.players && play.players.map((player) => player.player.fullName),
     period: periodOrdinals[play.about.period],
     time: play.about.periodTime,
     title: play.result.description
@@ -67,7 +68,7 @@ function formatPlay(play) {
       .replace("delaying game -", "delaying game by")
       .replace("delay of game -", "delaying game by")
       .replace("deflected", "deflection")
-      .replace("interference - goalkeeper", "goaltender interference")
+      .replace("interference - goalkeeper", "goaltender interference"),
   };
 }
 
@@ -76,14 +77,14 @@ async function fetchGame({ gamePk, seriesSummary }) {
     data: {
       gameData: {
         datetime: { dateTime },
-        teams: { away, home }
+        teams: { away, home },
       },
       liveData: {
         plays: {
           allPlays,
           scoringPlays,
           penaltyPlays,
-          currentPlay = { result: {} }
+          currentPlay = { result: {} },
         },
         linescore: {
           currentPeriod,
@@ -92,19 +93,19 @@ async function fetchGame({ gamePk, seriesSummary }) {
             away: {
               goals: awayGoals,
               numSkaters: awaySkaters,
-              shotsOnGoal: awayShots
+              shotsOnGoal: awayShots,
             },
             home: {
               goals: homeGoals,
               numSkaters: homeSkaters,
-              shotsOnGoal: homeShots
-            }
+              shotsOnGoal: homeShots,
+            },
           },
           intermissionInfo = {},
-          powerPlayInfo = {}
-        }
-      }
-    }
+          powerPlayInfo = {},
+        },
+      },
+    },
   } = await axios.get(
     `https://statsapi.web.nhl.com/api/v1/game/${gamePk}/feed/live`
   );
@@ -123,7 +124,7 @@ async function fetchGame({ gamePk, seriesSummary }) {
       code: away.abbreviation,
       goals: awayGoals,
       shots: awayShots,
-      skaters: awaySkaters
+      skaters: awaySkaters,
     },
     home: {
       name: home.name,
@@ -131,7 +132,7 @@ async function fetchGame({ gamePk, seriesSummary }) {
       code: home.abbreviation,
       goals: homeGoals,
       shots: homeShots,
-      skaters: homeSkaters
+      skaters: homeSkaters,
     },
     status: {
       started: allPlays.length > 1,
@@ -153,14 +154,14 @@ async function fetchGame({ gamePk, seriesSummary }) {
       intermission: !!intermissionInfo.inIntermission,
       intermissionClock:
         intermissionInfo.inIntermission &&
-        formatMinutes(intermissionInfo.intermissionTimeRemaining)
+        formatMinutes(intermissionInfo.intermissionTimeRemaining),
     },
     plays: [
-      ...scoringPlays.map(i => formatPlay(allPlays[i])),
-      ...penaltyPlays.map(i => formatPlay(allPlays[i])),
+      ...scoringPlays.map((i) => formatPlay(allPlays[i])),
+      ...penaltyPlays.map((i) => formatPlay(allPlays[i])),
       ...allPlays
-        .filter(play => titles[play.result.eventTypeId])
-        .map(play => ({
+        .filter((play) => titles[play.result.eventTypeId])
+        .map((play) => ({
           id: play.result.eventCode,
           date: moment(play.about.dateTime),
           type: play.result.eventTypeId,
@@ -172,34 +173,32 @@ async function fetchGame({ gamePk, seriesSummary }) {
                 return `End of ${periodNames[play.about.period]}`;
               case "GAME_END":
                 const winnerName =
-                  awayGoals > homeGoals
-                    ? away.abbreviation
-                    : home.abbreviation;
-  
+                  awayGoals > homeGoals ? away.abbreviation : home.abbreviation;
+
                 const winnerScore = Math.max(awayGoals, homeGoals);
                 const loserScore = Math.min(awayGoals, homeGoals);
                 return `${winnerName} wins ${winnerScore}-${loserScore}`;
               default:
                 return "Unknown";
             }
-          })()
-        }))
-    ].sort((a, b) => b.date.diff(a.date))
+          })(),
+        })),
+    ].sort((a, b) => b.date.diff(a.date)),
   };
 }
 
 export async function fetchGameThreads(games) {
   const {
     data: {
-      data: { children }
-    }
+      data: { children },
+    },
   } = await axios.get(
     `https://www.reddit.com/r/hockey/search.json?q=flair%3A%22%5BGDT%5D%22+OR+flair%3A%22%5BPGT%5D%22&restrict_sr=on&sort=new&t=month`
   );
 
   return children.reduce((acc, child) => {
     const { id, title, created } = child.data;
-    const game = games.find(game => {
+    const game = games.find((game) => {
       return (
         title.includes(game.home.teamName) &&
         title.includes(game.away.teamName) &&
@@ -218,7 +217,7 @@ function formatComment(comment) {
     team: flairPattern.test(comment.author_flair_text)
       ? flairPattern.exec(comment.author_flair_text)[1]
       : "nhl",
-    body: decode(comment.body_html)
+    body: decode(comment.body_html),
   };
 }
 
@@ -227,12 +226,12 @@ export async function fetchComments(id) {
     data: [
       ,
       {
-        data: { children }
-      }
-    ]
+        data: { children },
+      },
+    ],
   } = await axios.get(`https://www.reddit.com/r/hockey/comments/${id}.json`);
 
   return children
     .slice(0, children.length - 1)
-    .map(child => formatComment(child.data));
+    .map((child) => formatComment(child.data));
 }
