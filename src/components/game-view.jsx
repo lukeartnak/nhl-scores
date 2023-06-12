@@ -12,6 +12,15 @@ const GameViewWrapper = styled.div`
   grid-template-areas:
     "boxscore plays"
     "comments plays";
+
+  @media (max-width: 1268px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 320px auto;
+    grid-template-areas:
+      "boxscore"
+      "plays"
+      "comments";
+  }
 `;
 
 const BoxscoreSection = styled.section`
