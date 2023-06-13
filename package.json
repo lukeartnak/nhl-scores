@@ -2,7 +2,7 @@
   "name": "nhl-scores",
   "author": "Luke Artnak <lartnak@gmail.com>",
   "version": "0.1.0",
-  "homepage": "https://chel.app",
+  "homepage": "https://lukeartnak.github.io/nhl-scores/",
   "dependencies": {
     "axios": "^0.18.0",
     "decode-html": "^2.0.0",
